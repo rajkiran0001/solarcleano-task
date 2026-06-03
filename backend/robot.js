@@ -45,10 +45,11 @@ function startRobotSimulation() {
     setLatestState(state);
 
     console.log("STATE:", state);
+    let log = null;
 
     // optionally generate logs
     if (Math.random() < 0.1) {
-      const log = {
+      log = {
         timestamp: state.timestamp,
         message: "Random robot event",
       };
@@ -64,6 +65,13 @@ function startRobotSimulation() {
       type: "telemetry",
       data: state,
     });
+
+    if (log) {
+      broadcast({
+        type: "log",
+        data: log,
+      });
+    }
   }, 1000);
 
   console.log("Robot simulation started");
