@@ -1,46 +1,33 @@
-const CENTER_LAT = 49.634473;
-const CENTER_LON = 5.890937;
-const RADIUS_M   = 5;
+const http = require("http");
+const express = require("express");
+const cors = require("cors");
 
-// Degrees per metre at this latitude
-const LAT_DEG_PER_M = 1 / 111320;
-const LON_DEG_PER_M = 1 / (111320 * Math.cos(CENTER_LAT * Math.PI / 180));
+const { setupWebSocket } = require("./websocket");
+const { startRobotSimulation } = require("./robot");
 
-const RADIUS_LAT = RADIUS_M * LAT_DEG_PER_M;
-const RADIUS_LON = RADIUS_M * LON_DEG_PER_M;
+const app = express();
 
-const MOVE_TICKS   = 15;
-const CHARGE_TICKS = 5;
-const CYCLE        = MOVE_TICKS + CHARGE_TICKS; // 20 s
+// Middleware (optional but useful for debugging)
+app.use(cors());
+app.use(express.json());
 
-// Constant tangential speed: circumference / move duration
-const SPEED_MS = +((2 * Math.PI * RADIUS_M) / MOVE_TICKS).toFixed(2); // ≈ 2.09 m/s
+// Simple health check (VERY useful for testing)
+app.get("/health", (req, res) => {
+  res.json({ status: "ok" });
+});
 
-let battery = 100;
-let tick = 0;
+// Create HTTP server
+const server = http.createServer(app);
 
-setInterval(() => {
-  const phase    = tick % CYCLE;
-  const charging = phase >= MOVE_TICKS;
+// Attach WebSocket server
+setupWebSocket(server);
 
-  // Robot returns to angle 0 to charge; advances around the circle while moving
-  const angle = charging ? 0 : (phase / MOVE_TICKS) * 2 * Math.PI;
+// Start robot simulation loop
+startRobotSimulation();
 
-  battery = charging
-    ? Math.min(100, +(battery + 1.0).toFixed(1))
-    : Math.max(0,   +(battery - 0.3).toFixed(1));
+// Start server
+const PORT = process.env.PORT || 8000;
 
-  console.log(JSON.stringify({
-    timestamp: new Date().toISOString(),
-    battery,
-    status:    charging ? 'charging' : 'moving',
-    speed:     charging ? 0.0 : SPEED_MS,
-    latitude:  +(CENTER_LAT + RADIUS_LAT * Math.sin(angle)).toFixed(6),
-    longitude: +(CENTER_LON + RADIUS_LON * Math.cos(angle)).toFixed(6),
-    event:     null,
-  }));
-
-  tick++;
-}, 1000);
-
-console.log('Mock backend running — telemetry logged every second');
+server.listen(PORT, () => {
+  console.log(`Backend running on http://localhost:${PORT}`);
+});
