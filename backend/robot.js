@@ -1,3 +1,5 @@
+const { broadcast } = require("./websocket");
+
 const { setLatestState, addLog } = require("./state");
 
 const CENTER_LAT = 49.634473;
@@ -57,6 +59,11 @@ function startRobotSimulation() {
     }
 
     tick++;
+
+    broadcast({
+      type: "telemetry",
+      data: state,
+    });
   }, 1000);
 
   console.log("Robot simulation started");

@@ -1,8 +1,19 @@
 const WebSocket = require("ws");
 const { getLatestState, getLogs } = require("./state");
 
+let wss;
+function broadcast(message) {
+  if (!wss) return;
+
+  wss.clients.forEach((client) => {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(JSON.stringify(message));
+    }
+  });
+}
+
 function setupWebSocket(server) {
-  const wss = new WebSocket.Server({ server });
+  wss = new WebSocket.Server({ server });
 
   wss.on("connection", (ws) => {
     console.log("Client connected");
@@ -33,4 +44,4 @@ function setupWebSocket(server) {
   };
 }
 
-module.exports = { setupWebSocket };
+module.exports = { setupWebSocket, broadcast };
