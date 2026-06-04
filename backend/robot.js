@@ -1,6 +1,6 @@
 const { broadcast } = require("./websocket");
 
-const { setLatestState, addLog } = require("./state");
+const { setLatestState, addLog, getRunning } = require("./state");
 
 const CENTER_LAT = 49.634473;
 const CENTER_LON = 5.890937;
@@ -23,6 +23,10 @@ let tick = 0;
 
 function startRobotSimulation() {
   setInterval(() => {
+    if (!getRunning()) {
+      tick++;
+      return; // robot paused
+    }
     const phase = tick % CYCLE;
     const charging = phase >= MOVE_TICKS;
 

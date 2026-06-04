@@ -1,5 +1,5 @@
 const WebSocket = require("ws");
-const { getLatestState, getLogs } = require("./state");
+const { getLatestState, getLogs, setRunning } = require("./state");
 
 let wss;
 function broadcast(message) {
@@ -17,7 +17,21 @@ function setupWebSocket(server) {
 
   wss.on("connection", (ws) => {
     console.log("Client connected");
+    ws.on("message", (msg) => {
+      const data = JSON.parse(msg);
 
+      if (data.type === "command") {
+        if (data.command === "start") {
+          setRunning(true);
+          console.log("Robot STARTED");
+        }
+
+        if (data.command === "stop") {
+          setRunning(false);
+          console.log("Robot STOPPED");
+        }
+      }
+    });
     // Send INITIAL snapshot of state
     ws.send(
       JSON.stringify({
