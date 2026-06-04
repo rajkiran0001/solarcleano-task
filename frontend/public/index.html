@@ -1,12 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Robot Monitor</title>
 </head>
+
 <body>
   <h1>Robot Monitor</h1>
   <p>Build your interface here. The backend logs telemetry to stdout every second.</p>
+
+
+  <div id="status"></div>
+
+  <button onclick="startRobot()">START</button>
+  <button onclick="stopRobot()">STOP</button>
+
+  <h3>Telemetry</h3>
+  <pre id="telemetry"></pre>
+
+  <h3>Logs</h3>
+  <div id="logs"></div>
+
+  <script src="app.js"></script>
 </body>
+
 </html>
