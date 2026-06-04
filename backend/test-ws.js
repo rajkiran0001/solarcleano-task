@@ -6,6 +6,26 @@ ws.on("open", () => {
   console.log("Connected");
 });
 
+setTimeout(() => {
+  console.log("Sending STOP");
+  ws.send(
+    JSON.stringify({
+      type: "command",
+      command: "stop",
+    }),
+  );
+}, 5000);
+
+setTimeout(() => {
+  console.log("Sending START");
+  ws.send(
+    JSON.stringify({
+      type: "command",
+      command: "start",
+    }),
+  );
+}, 10000);
+
 ws.on("message", (data) => {
   console.log("Received:", data.toString());
 });

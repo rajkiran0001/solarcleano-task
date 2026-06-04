@@ -1,6 +1,14 @@
 let latestRobotState = null;
 let recentLogs = [];
+let isRunning = true;
 
+function setRunning(value) {
+  isRunning = value;
+}
+
+function getRunning() {
+  return isRunning;
+}
 function setLatestState(state) {
   latestRobotState = state;
 }
@@ -27,4 +35,6 @@ module.exports = {
   getLatestState,
   addLog,
   getLogs,
+  setRunning,
+  getRunning,
 };
